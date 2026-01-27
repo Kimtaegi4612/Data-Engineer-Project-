@@ -1,0 +1,104 @@
+# version: '3.8'
+
+# services:
+#   # 1. 데이터베이스 (기존과 동일)(PostgreSQL)
+#   postgres:
+#     image: postgres:15
+#     container_name: my_postgres
+#     environment:
+#       POSTGRES_USER: user
+#       POSTGRES_PASSWORD: password
+#       POSTGRES_DB: upbit_dw
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - ./data/postgres:/var/lib/postgresql/data
+#     healthcheck:
+#       test: ["CMD", "pg_isready", "-U", "user"]
+#       interval: 5s
+#       retries: 5
+
+#   # 2. DB 관리 도구 (기존과 동일)(pgAdmin) - 눈으로 DB 보려고 설치함
+
+#   pgadmin:
+#     image: dpage/pgadmin4
+#     container_name: my_pgadmin
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: admin@admin.com
+#       PGADMIN_DEFAULT_PASSWORD: rlaxorl12 #pqAdmin4 비밀번호 
+#     ports:
+#       - "8080:80"
+
+#   # 3. Airflow 스케줄러 & 웹서버 (새로 추가!)
+#   airflow:
+#     image: apache/airflow:2.9.0
+#     container_name: my_airflow
+#     environment:
+#       - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+#       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+#       - AIRFLOW__CORE__LOAD_EXAMPLES=False
+#       - _PIP_ADDITIONAL_REQUIREMENTS=requests psycopg2-binary
+#     volumes:
+#       - ./airflow/dags:/opt/airflow/dags
+#       - ./src:/opt/airflow/src
+#       - ./airflow/logs:/opt/airflow/logs
+#     ports:
+#       - "8081:8080"
+#     command: bash -c "airflow db init && airflow users create --username admin --password admin --firstname admin --lastname admin --role Admin --email admin@example.com || true; airflow webserver & airflow scheduler"
+
+#         # docker compose down - 도커 끄기 
+
+#        # docker compose up -d - 실행하기 
+#       # 실행 후 http://localhost:8080(포트 번호) 주소 들어가서 로그인 화면 뜨면 가상의 DB 서버 생성 완료 
+
+#       # pip install requests psycopg2-binary 파이썬이 인터넷(업비트)에 접속하고, DB(포스트그레스)에 말을 걸려먼 도구가 필요
+      
+
+
+version: '3.8'
+
+services:
+  # 1. 데이터베이스 (기존과 동일)
+  postgres:
+    image: postgres:15
+    container_name: my_postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: upbit_dw
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 5s
+      retries: 5
+
+  # 2. DB 관리 도구 (기존과 동일)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: my_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin             # pgAdmin 아디 비번 
+    ports:
+      - "8080:80"
+
+  # 3. Airflow 스케줄러 & 웹서버 (새로 추가!)
+  # 3. Airflow 스케줄러 & 웹서버
+  airflow:
+    image: apache/airflow:2.9.0
+    container_name: my_airflow
+    environment:
+      # 충돌나는 설정 2줄 삭제함 (이제 기본값인 SequentialExecutor로 돌아갑니다)
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - _PIP_ADDITIONAL_REQUIREMENTS=requests psycopg2-binary
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+    ports:
+      - "8081:8080"
+    command: airflow standalone
+
+    # airflow standalone | Login with username: admin  password: uhCQH62DY4cG84sw

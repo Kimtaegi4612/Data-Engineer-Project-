@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Virtual env
+.venv/
+venv/
+
+# Secrets
+.env
+*.env
+*.pem
+*.key
+credentials*.json
+
+# Data (원본 제외)
+data/
+
+# Logs / outputs
+logs/
+output/
+outputs/
+results/
+*.log
+
+# OS/IDE
+.DS_Store
+.vscode/
+.idea/
+
+# DB files
+*.db
+*.sqlite
+*.sqlite3
