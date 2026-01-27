@@ -12,25 +12,33 @@ default_args = {
 
 
 
+# ... (위쪽 생략) ...
+
 with DAG(
     'upbit_collect_dag',
     default_args=default_args,
-    schedule_interval='* * * * *',  # 크론 표현식: 매 1분마다 실행
-    catchup=False,  # 과거 데이터는 무시하고 현재부터 실행
-    tags=['upbit', 'bronze', 'silver'],
+    schedule_interval='* * * * *',
+    catchup=False,
+    tags=['upbit', 'bronze', 'silver', 'gold'], # 태그 업데이트
 ) as dag:
-    
-    # 1. 수집 태스크 (기존)
+
+    # 1. 수집
     collect_task = BashOperator(
         task_id='collect_all_markets',
         bash_command='python /opt/airflow/src/collect_price.py'
     )
 
-    # 2. 변환 태스크 Silver 변환 (새로 추가!)
+    # 2. 정제
     transform_task = BashOperator(
         task_id='transform_to_silver',
         bash_command='python /opt/airflow/src/transform_silver.py'
     )
 
-    # 순서 연결: 수집이 끝나면(>>) 변환해라
-    collect_task >> transform_task
+    # 3. 집계 (새로 추가!)
+    mart_task = BashOperator(
+        task_id='build_gold_mart',
+        bash_command='python /opt/airflow/src/build_gold.py'
+    )
+
+    # 순서: 수집 >> 정제 >> 요리
+    collect_task >> transform_task >> mart_task
