@@ -102,3 +102,21 @@ services:
     command: airflow standalone
 
     # airflow standalone | Login with username: admin  password: uhCQH62DY4cG84sw
+
+
+  # 4. 시각화 도구 (Metabase)
+  # user       culllau1@naver.com dkelektm01 
+  # password 
+  metabase:
+    image: metabase/metabase:latest
+    container_name: my_metabase
+    ports:
+      - "3000:3000"
+    volumes:
+      - metabase_data:/metabase.db  # 설정값 저장소
+    networks:
+      - default
+
+# (파일 맨~ 끝에 volumes 섹션이 없다면 추가해주세요. 있으면 그 밑에 metabase_data만 추가)
+volumes:
+  metabase_data:
