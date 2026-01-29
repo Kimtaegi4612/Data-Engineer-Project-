@@ -87,6 +87,7 @@ services:
 
   # 3. Airflow 스케줄러 & 웹서버 (새로 추가!)
   # 3. Airflow 스케줄러 & 웹서버
+  # id admin password admin
   airflow:
     image: apache/airflow:2.9.0
     container_name: my_airflow

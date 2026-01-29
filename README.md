@@ -57,3 +57,41 @@ Airflow로 스케줄링하여 재현 가능한 데이터 파이프라인과 지�
 - `airflow/` : DAG 및 스케줄링/오케스트레이션 코드
 - `src/` : 수집/정제/집계(ETL/ELT) 파이프라인 코드
 - `docker-compose.yml` : Airflow/DB 등 로컬 실행 환경
+
+
+📚 데이터 사전 (Data Dictionary)
+1. Bronze Layer (Raw Data)
+Table: bronze.ticker_raw
+
+설명: Upbit API로부터 수집한 JSON 원본 데이터를 저장하는 적재 테이블 (ELT 원본 보존용)
+
+컬럼명 (Column),데이터 타입,설명 (Description),비고
+id,SERIAL (PK),고유 식별자,자동 증가
+market,VARCHAR(10),종목 코드,예: KRW-BTC
+raw_data,JSONB,API 응답 원본,스키마 변경 대응을 위한 비정형 저장
+ingested_at,TIMESTAMP,데이터 적재 시각,수집된 시점 (파티셔닝 및 재처리 기준)
+
+2. Silver Layer (Cleansed Data)
+Table: silver.ticker
+
+설명: JSON 원본을 파싱하여 정형화된 형태로 변환한 테이블 (분석용)
+
+컬럼명 (Column),데이터 타입,설명 (Description),비고
+id,SERIAL (PK),고유 식별자,
+market,VARCHAR(30),종목 코드,예: KRW-BTC
+trade_date,VARCHAR(8),거래 일자 (KST),포맷: YYYYMMDD
+trade_time,VARCHAR(6),거래 시각 (KST),포맷: HHMMSS
+trade_price,NUMERIC,거래 가격,
+acc_trade_volume,NUMERIC,누적 거래량 (24h),
+ingested_at,TIMESTAMP,데이터 적재 시각,Bronze 데이터가 Silver로 변환된 시점
+
+3. Gold Layer (Data Mart)
+Table: gold.market_stats
+
+설명: 비즈니스 KPI(거래대금 순위 등)를 집계하여 대시보드 서빙 속도를 최적화한 마트
+
+
+
+
+
+
