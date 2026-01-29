@@ -58,6 +58,7 @@ Airflow로 스케줄링하여 재현 가능한 데이터 파이프라인과 지�
 - `src/` : 수집/정제/집계(ETL/ELT) 파이프라인 코드
 - `docker-compose.yml` : Airflow/DB 등 로컬 실행 환경
 
+---
 
 # 📚 데이터 사전 (Data Dictionary)
 ## 1. Bronze Layer (Raw Data)
@@ -99,4 +100,13 @@ daily_volume,NUMERIC,24시간 누적 거래량,정렬 기준
 rank_volume,INT,거래대금 순위,윈도우 함수(RANK) 계산 결과  
 
 
+### 🛡️ 장애 대응 가이드 (Backfill Process)
+API 장애나 로직 오류로 인해 잘못된 데이터가 적재되었을 경우, `ingested_at`(적재 시각)을 기준으로 빠르고 정확하게 복구를 수행합니다.
 
+**상황 예시:** 14:00 ~ 14:10 사이에 수집된 데이터의 환율 계산 로직 오류 발생.
+
+**1. 오염된 데이터 범위 파악 및 삭제 (Rollback)**
+```sql
+-- 문제가 된 적재 시간대(ingested_at)의 데이터만 특정하여 삭제
+DELETE FROM silver.ticker 
+WHERE ingested_at BETWEEN '2026-01-29 14:00:00' AND '2026-01-29 14:10:00';
