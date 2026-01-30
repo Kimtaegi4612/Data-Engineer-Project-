@@ -107,6 +107,6 @@ API 장애나 로직 오류로 인해 잘못된 데이터가 적재되었을 경
 
 **1. 오염된 데이터 범위 파악 및 삭제 (Rollback)**
 ```sql
--- 문제가 된 적재 시간대(ingested_at)의 데이터만 특정하여 삭제
+-- 문제가 된 적재 시간대(ingested_at)의 데이터만 특정하여 삭제.
 DELETE FROM silver.ticker 
 WHERE ingested_at BETWEEN '2026-01-29 14:00:00' AND '2026-01-29 14:10:00';
